@@ -30,7 +30,7 @@ val INVALID_VALUES__DESCRIPTION = listOf(
       )
 
 
-object JsonConversionMatcherTest : Spek({
+object JsonDeserializeMatcherTest : Spek({
   describe("deserializesTo") {
     describe("no match argument") {
       for ((value, description) in INVALID_VALUES__DESCRIPTION) {
