@@ -24,17 +24,17 @@ val INVALID_VALUES__DESCRIPTION = listOf(
       )
 
 object JsonConversionMatcherTest : Spek({
-  describe("convertsTo") {
+  describe("deserializesTo") {
     describe("no match argument") {
       for ((value, description) in INVALID_VALUES__DESCRIPTION) {
         it("mismatch - $description") {
-          val matcher = convertsTo<String>()
+          val matcher = deserializesTo<String>()
 
           assertMismatch(matcher(value))
         }
       }
       it("valid value") {
-        val matcher = convertsTo<String>()
+        val matcher = deserializesTo<String>()
 
         assertMatch(matcher(JSON_SOURCE))
       }
@@ -42,12 +42,12 @@ object JsonConversionMatcherTest : Spek({
 
     describe("match argument") {
       it("valid value and sub-matcher also matches") {
-        val matcherWithSubMatcher = convertsTo(Matcher(String::isNotEmpty))
+        val matcherWithSubMatcher = deserializesTo(Matcher(String::isNotEmpty))
 
         assertMatch(matcherWithSubMatcher(JSON_SOURCE))
       }
       it("valid value and sub-matcher not matches") {
-        val matcherWithSubMatcher = convertsTo(Matcher(String::isEmpty))
+        val matcherWithSubMatcher = deserializesTo(Matcher(String::isEmpty))
 
         assertMismatch(matcherWithSubMatcher(JSON_SOURCE))
       }
@@ -56,18 +56,18 @@ object JsonConversionMatcherTest : Spek({
     describe("value argument") {
       for ((value, description) in INVALID_VALUES__DESCRIPTION) {
         it("mismatch - $description") {
-          val matcher = convertsTo(EXPECTED_VALUE)
+          val matcher = deserializesTo(EXPECTED_VALUE)
 
           assertMismatch(matcher(value))
         }
       }
       it("valid value and matches expected") {
-        val matcher = convertsTo(EXPECTED_VALUE)
+        val matcher = deserializesTo(EXPECTED_VALUE)
 
         assertMatch(matcher(JSON_SOURCE))
       }
       it("valid value and but doesn't match expected") {
-        val matcher = convertsTo(EXPECTED_VALUE)
+        val matcher = deserializesTo(EXPECTED_VALUE)
 
         assertMismatch(matcher(OTHER_JSON_SOURCE))
       }
@@ -75,23 +75,23 @@ object JsonConversionMatcherTest : Spek({
   }
   describe("description") {
     it("no matcher - includes class name") {
-      val matcher = convertsTo<String>()
+      val matcher = deserializesTo<String>()
 
       assertThat(matcher.description, containsSubstring(String::class.simpleName!!))
     }
     it("no matcher, class name not known - includes unknown") {
-      val matcher = JsonConversionMatcher(className = null, adapter = Moshi.Builder().build().adapter(String::class.java), match = null)
+      val matcher = JsonDeserializeMatcher(className = null, adapter = Moshi.Builder().build().adapter(String::class.java), match = null)
 
       assertThat(matcher.description, containsSubstring("unknown type"))
     }
     it("matcher - includes matcher description") {
       val valueMatcher = equalTo(EXPECTED_VALUE)
-      val matcher = convertsTo(valueMatcher)
+      val matcher = deserializesTo(valueMatcher)
 
       assertThat(matcher.description, containsSubstring(describe(valueMatcher)))
     }
     it("negated - includes description") {
-      val matcher = convertsTo<String>()
+      val matcher = deserializesTo<String>()
       val negatedMatcher = !matcher
 
       assertThat(negatedMatcher.description, containsSubstring(matcher.description))
