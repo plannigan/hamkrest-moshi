@@ -21,8 +21,12 @@ fun Project.testWithJunit() {
         reports.junitXml.isEnabled = true
     }
 }
+const val DEFAULT_MIN_BRANCH_COVERAGE = .75
+const val DEFAULT_MIN_INSTRUCTION_COVERAGE = .8
 
-fun Project.coverWithJacoco() {
+fun Project.coverWithJacoco(
+        minBranchCoverage: Double = DEFAULT_MIN_BRANCH_COVERAGE,
+        minInstructionCoverage: Double = DEFAULT_MIN_INSTRUCTION_COVERAGE) {
     val check by tasks
     val jacocoTestReport by tasks
 
@@ -34,8 +38,8 @@ fun Project.coverWithJacoco() {
             rule {
                 element = "BUNDLE"
                 excludes = listOf("com.jacoco.dto.*")
-                limit("INSTRUCTION", 0.90)
-                limit("BRANCH", 0.75)
+                limit("INSTRUCTION", minInstructionCoverage)
+                limit("BRANCH", minBranchCoverage)
             }
         }
     }
