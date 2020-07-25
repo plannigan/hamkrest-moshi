@@ -15,16 +15,18 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("stdlib"))
     implementation(Deps.hamkrest)
     implementation(Deps.Moshi.moshi)
 
+    testImplementation(Deps.Moshi.reflection)
     testImplementation(Deps.Spek.api)  {
         exclude(Groups.kotlin)
     }
     testRuntimeOnly(Deps.Spek.engine)
     // spek requires kotlin-reflect
     testRuntimeOnly(Deps.kotlinReflect)
-    implementation(kotlin("stdlib-jdk8"))
+    "kaptTest"(Deps.Moshi.codeGen)
 }
 
 tasks.withType<KotlinCompile>() {
