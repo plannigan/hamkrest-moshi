@@ -20,6 +20,8 @@ const val SOME_KEY = "bar-123"
 const val SOME_COUNT = 50
 val SOME_BAR = Bar(key = SOME_KEY, count = SOME_COUNT)
 const val SOME_BAR_JSON = """{"key":"$SOME_KEY","count":$SOME_COUNT}"""
+val SOME_ARRAYLIST = arrayListOf(1, 2, 3)
+const val SOME_ARRAYLIST_JSON = "[1, 2, 3]"
 
 
 val INVALID_VALUES__DESCRIPTION = listOf(
@@ -54,6 +56,19 @@ object JsonDeserializeMatcherTest : Spek({
         val matcher = deserializesTo<Foo>(moshi = makeMoshiReflection())
 
         assertMatch(matcher(SOME_FOO_JSON))
+      }
+    }
+
+    describe("type needs adapter added") {
+      it("reflection required, but not there") {
+        val matcher = deserializesTo(SOME_FOO)
+
+        assertMismatch(matcher(SOME_FOO_JSON))
+      }
+      it("platform type") {
+        val matcher = deserializesTo(SOME_ARRAYLIST)
+
+        assertMismatch(matcher(SOME_ARRAYLIST_JSON))
       }
     }
 
@@ -119,10 +134,17 @@ object JsonDeserializeMatcherTest : Spek({
 
       assertThat(matcher.description, containsSubstring(String::class.simpleName!!))
     }
-    it("no matcher, class name not known - includes unknown") {
-      val matcher = JsonDeserializeMatcher(className = null, adapter = Moshi.Builder().build().adapter(String::class.java), match = null)
+    it("no matcher, anonymous class - includes unknown") {
+      val matcher = JsonDeserializeMatcher(
+              Container.anonymousInstance::class.java, Moshi.Builder().build(),
+              match = null)
 
-      assertThat(matcher.description, containsSubstring("unknown type"))
+      assertThat(matcher.description, containsSubstring(UNKNOWN_TYPE_NAME))
+    }
+    it("array of anonymous class - includes unknown") {
+      // Haven't been able to find a way to create an array of an anonymous class
+      // or mock Class<T> to return this possible value, so explicitly test value
+      assertThat(tweakClassSimpleName("[]"), containsSubstring(ARRAY_UNKNOWN_TYPE_NAME))
     }
     it("matcher - includes matcher description") {
       val valueMatcher = equalTo(EXPECTED_VALUE)
