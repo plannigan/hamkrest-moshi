@@ -36,5 +36,6 @@ tasks.withType<KotlinCompile>() {
 }
 
 testWithJunit()
-// Low for now, but expected to increase with serialize implementation
-coverWithJacoco(minInstructionCoverage = .7, minBranchCoverage = .55)
+// Values are artificially low because inline function are not currently reported accurately
+// https://github.com/jacoco/jacoco/issues/654
+coverWithJacoco(minInstructionCoverage = .7, minBranchCoverage = .45)

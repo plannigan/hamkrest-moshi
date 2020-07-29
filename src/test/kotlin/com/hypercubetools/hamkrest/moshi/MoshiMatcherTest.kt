@@ -252,7 +252,7 @@ object JsonSerializeMatcherTest : Spek({
       assertThat(matcher.description, containsSubstring(String::class.simpleName!!))
     }
     it("no matcher, anonymous class - includes unknown") {
-      val matcher = JsonDeserializeMatcher(
+      val matcher = JsonSerializeMatcher(
               Container.anonymousInstance::class.java, Moshi.Builder().build(),
               match = null)
 
