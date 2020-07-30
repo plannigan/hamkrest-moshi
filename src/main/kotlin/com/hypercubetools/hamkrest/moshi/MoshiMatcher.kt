@@ -17,74 +17,77 @@ inline fun <reified TOut> deserializesTo(value: TOut, moshi: Moshi = Moshi.Build
 inline fun <reified TOut> deserializesTo(match: Matcher<TOut>? = null, moshi: Moshi = Moshi.Builder().build()): Matcher<String?> =
         JsonDeserializeMatcher(TOut::class.java, moshi, match)
 
-// Implemented outside of inline function so test coverage is reported correctly
-// https://github.com/jacoco/jacoco/issues/654
+inline fun <reified TIn> serializesTo(value: String, moshi: Moshi = Moshi.Builder().build()): Matcher<TIn> = serializesTo(equalTo(value), moshi)
+
+inline fun <reified TIn> serializesTo(match: Matcher<String>? = null, moshi: Moshi = Moshi.Builder().build()): Matcher<TIn> =
+        JsonSerializeMatcher(TIn::class.java, moshi, match)
+
 class JsonDeserializeMatcher<TOut>(
-        private val targetClass: Class<TOut>,
-        private val moshi: Moshi,
-        private val match: Matcher<TOut>?) : Matcher<String?> {
+        targetClass: Class<TOut>,
+        moshi: Moshi,
+        match: Matcher<TOut>?) : BaseMatcher<TOut, TOut, String?>("deserialize", targetClass, moshi, match) {
     override fun invoke(actual: String?): MatchResult {
         if (actual == null) {
             return MatchResult.Mismatch("actual was null")
         }
         val adapter: JsonAdapter<TOut>
         try {
-            adapter = moshi.adapter(targetClass).failOnUnknown()
+            adapter = retrieveAdapter(targetClass)
         } catch (ex: IllegalArgumentException) {
-            return MatchResult.Mismatch("Moshi adapter could not be created: $ex")
+            return adapterFailure(ex)
         }
-        return try {
-            val deserialized = adapter.fromJson(actual) ?: return MatchResult.Mismatch("deserialized result was null")
-            // Smart-cast for nullable lambda property
-            // https://youtrack.jetbrains.com/issue/KT-4113
-            val theMatcher = match
-            if (theMatcher == null) {
-                MatchResult.Match
-            } else {
-                theMatcher(deserialized)
-            }
+        val deserialized: TOut
+        try {
+            deserialized = adapter.fromJson(actual) ?: return MatchResult.Mismatch("deserialized result was null")
         } catch (ex: JsonDataException) {
-            MatchResult.Mismatch("failed to deserialize: $ex")
+            return MatchResult.Mismatch("failed to deserialize: $ex")
         } catch (ex: IOException) {
-            MatchResult.Mismatch("failed to deserialize: $ex")
+            return MatchResult.Mismatch("failed to deserialize: $ex")
         }
+        return verify(deserialized)
     }
-
-    override val description get() = "deserializes to ${if (match == null) targetName else describe(match)}"
-    override val negatedDescription: String get() = "is not $description"
-    private val targetName = tweakClassSimpleName(targetClass.simpleName)
 }
 
-inline fun <reified TIn> serializesTo(value: String, moshi: Moshi = Moshi.Builder().build()): Matcher<TIn> = serializesTo(equalTo(value), moshi)
-
-inline fun <reified TIn> serializesTo(match: Matcher<String>? = null, moshi: Moshi = Moshi.Builder().build()): Matcher<TIn> =
-        JsonSerializeMatcher(TIn::class.java, moshi, match)
-
 class JsonSerializeMatcher<TIn>(
-        private val targetClass: Class<TIn>,
-        private val moshi: Moshi,
-        private val match: Matcher<String>?) : Matcher<TIn> {
+        targetClass: Class<TIn>,
+        moshi: Moshi,
+        match: Matcher<String>?) : BaseMatcher<TIn, String, TIn>("serialize", targetClass, moshi, match) {
     override fun invoke(actual: TIn): MatchResult {
         val adapter: JsonAdapter<TIn>
         try {
-            adapter = moshi.adapter(targetClass).failOnUnknown()
+            adapter = retrieveAdapter(targetClass)
         } catch (ex: IllegalArgumentException) {
-            return MatchResult.Mismatch("Moshi adapter could not be created: $ex")
+            return adapterFailure(ex)
         }
         val serialized = adapter.toJson(actual)
+        return verify(serialized)
+    }
+}
+
+sealed class BaseMatcher<TTarget, TMatchArg, TMatch>(
+        private val actionDescription: String,
+        protected val targetClass: Class<TTarget>,
+        private val moshi: Moshi,
+        private val match: Matcher<TMatchArg>?) : Matcher<TMatch> {
+
+    protected fun verify(value: TMatchArg) : MatchResult {
         // Smart-cast for nullable lambda property
         // https://youtrack.jetbrains.com/issue/KT-4113
         val theMatcher = match
         return if (theMatcher == null) {
             MatchResult.Match
         } else {
-            theMatcher(serialized)
+            theMatcher(value)
         }
     }
 
-    override val description get() = "deserializes to ${if (match == null) targetName else describe(match)}"
+    protected fun <T> retrieveAdapter(targetClass: Class<T>): JsonAdapter<T> = moshi.adapter(targetClass).failOnUnknown()
+    protected fun adapterFailure(ex: IllegalArgumentException) =
+            MatchResult.Mismatch("Moshi adapter could not be created: $ex")
+
+    override val description get() =
+        "$actionDescription to ${if (match == null) tweakClassSimpleName(targetClass.simpleName) else describe(match)}"
     override val negatedDescription: String get() = "is not $description"
-    private val targetName = tweakClassSimpleName(targetClass.simpleName)
 }
 
 // Details on what simpleName can return
