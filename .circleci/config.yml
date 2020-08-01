@@ -35,6 +35,15 @@ workflows:
           <<: *not_github_pages
       - build:
           <<: *not_github_pages
+      - deploy:
+          requires:
+            - build
+            - check
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+([-\w]+)?$/
+            branches:
+              ignore: /.*/
 
 
 commands:
@@ -96,3 +105,12 @@ jobs:
 
       - store_artifacts:
           path: build/libs
+
+  deploy:
+    <<: *job_defaults
+    steps:
+      - checkout
+
+      - with_gradle_cache:
+          task:
+            - run: ./gradlew bintrayUpload
