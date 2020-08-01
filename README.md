@@ -1,5 +1,6 @@
 [![Kotlin](https://img.shields.io/badge/kotlin-1.3.72-blue.svg)](http://kotlinlang.org)
 [![CircleCI](https://circleci.com/gh/plannigan/hamkrest-moshi.svg?style=svg)](https://circleci.com/gh/plannigan/hamkrest-moshi)
+[![Download](https://api.bintray.com/packages/plannigan/com.hypercubetools/hamkrest-moshi/images/download.svg)](https://bintray.com/plannigan/com.hypercubetools/hamkrest-moshi/_latestVersion)
 [![codecov](https://codecov.io/gh/plannigan/hamkrest-moshi/branch/main/graph/badge.svg)](https://codecov.io/gh/plannigan/hamkrest-moshi)
 
 # hamkrest-moshi
