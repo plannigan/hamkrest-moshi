@@ -1,61 +1,69 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("jvm") version "1.3.72"
-    kotlin("kapt") version "1.3.72"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
     jacoco
-    `maven-publish`
-    id("com.jfrog.bintray")
-    id("org.jetbrains.dokka") version "0.10.1"
 }
 
 group = "com.hypercubetools"
 version = "0.1.0"
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(Deps.hamkrest)
-    implementation(Deps.Moshi.moshi)
+    implementation(libs.hamkrest)
+    implementation(libs.moshi)
 
-    testImplementation(Deps.Moshi.reflection)
-    testImplementation(Deps.Spek.api)  {
-        exclude(Groups.kotlin)
+    testImplementation(libs.moshi.reflection)
+    testImplementation(libs.spek.api)  {
+        exclude("org.jetbrains.kotlin")
     }
-    testRuntimeOnly(Deps.Spek.engine)
+    testRuntimeOnly(libs.spek.engine)
     // spek requires kotlin-reflect
-    testRuntimeOnly(Deps.kotlinReflect)
-    "kaptTest"(Deps.Moshi.codeGen)
+    testRuntimeOnly(libs.kotlin.reflect)
+    "kaptTest"(libs.moshi.codeGen)
 }
 
-tasks.withType<KotlinCompile>() {
-    kotlinOptions {
-        jvmTarget = Versions.targetJvm
+tasks.test {
+    useJUnitPlatform()
+
+    testLogging {
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            element = "BUNDLE"
+            excludes = listOf("com.jacoco.dto.*")
+            limit {
+                counter = "INSTRUCTION"
+                minimum = 0.60.toBigDecimal()
+            }
+            limit {
+                counter = "BRANCH"
+                minimum = 0.55.toBigDecimal()
+            }
+        }
     }
 }
 
-testWithJunit()
-// Values are artificially low because inline function are not currently reported accurately
-// https://github.com/jacoco/jacoco/issues/654
-coverWithJacoco(minInstructionCoverage = .7, minBranchCoverage = .45)
-
-
-val dokka by tasks.getting(DokkaTask::class) {
-    outputFormat = "html"
-    outputDirectory = "$buildDir/dokka"
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
-
-val packageJavadoc by tasks.registering(Jar::class) {
-    dependsOn("dokka")
-    archiveClassifier.set("javadoc")
-    from(dokka.outputDirectory)
-}
-
-val POM_ARTIFACT_ID: String by project
-
-publishAs(POM_ARTIFACT_ID, tasks.kotlinSourcesJar, packageJavadoc)
