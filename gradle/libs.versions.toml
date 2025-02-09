@@ -3,12 +3,11 @@ kotlin = "1.9.25"
 moshi = "1.15.2"
 hamkrest = "1.7.0.3"
 spek = "2.0.12"
-dokka = "0.10.1"
+jacocolog = "3.1.0"
 
 [libraries]
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
 moshi-codeGen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
-moshi-adapters = { group = "com.squareup.moshi", name = "moshi-adapters", version.ref = "moshi" }
 moshi-reflection = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi" }
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin"}
@@ -21,4 +20,4 @@ spek-engine = { group = "org.spekframework.spek2", name = "spek-runner-junit5", 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }

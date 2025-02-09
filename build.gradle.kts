@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
     jacoco
+    alias(libs.plugins.jacocolog)
 }
 
 group = "com.hypercubetools"
