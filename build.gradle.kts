@@ -1,8 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     jacoco
     alias(libs.plugins.jacocolog)
 }
@@ -26,7 +28,17 @@ dependencies {
     testRuntimeOnly(libs.spek.engine)
     // spek requires kotlin-reflect
     testRuntimeOnly(libs.kotlin.reflect)
-    "kaptTest"(libs.moshi.codeGen)
+    kspTest(libs.moshi.codeGen)
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 tasks.test {

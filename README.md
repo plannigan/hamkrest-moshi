@@ -1,4 +1,4 @@
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.25-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.1.10-blue.svg)](http://kotlinlang.org)
 [![CI](https://github.com/plannigan/hamkrest-moshi/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/plannigan/hamkrest-moshi/actions/workflows/main.yaml)
 [![codecov](https://codecov.io/gh/plannigan/hamkrest-moshi/branch/main/graph/badge.svg)](https://codecov.io/gh/plannigan/hamkrest-moshi)
 
