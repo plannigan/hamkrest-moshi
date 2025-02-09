@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Update project dependencies:
     * moshi to `1.15.2`
+    * hamkrest to `1.8.0.1`
     * Kotlin to `1.9.25`
 
 ### Internal
