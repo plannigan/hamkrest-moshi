@@ -1,0 +1,15 @@
+[hyper-bump-it.git.actions]
+commit = "create"
+branch = "create"
+
+[[hyper-bump-it.files]]
+file_glob = "build.gradle.kts"
+keystone = true
+search_format_pattern = "version = \"{version}\""
+
+[[hyper-bump-it.files]]
+file_glob = "CHANGELOG.md"
+search_format_pattern = "## [Unreleased]"
+replace_format_pattern = """## [Unreleased]
+
+## [{version}] - {today}"""

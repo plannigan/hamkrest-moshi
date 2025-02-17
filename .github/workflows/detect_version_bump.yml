@@ -1,0 +1,46 @@
+name: Version Bump merged
+
+on:
+  pull_request:
+    types:
+      - "closed"
+    branches:
+      - "main"
+
+permissions: {}
+
+jobs:
+  trigger-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged &&
+        startsWith(github.head_ref, 'bump_version_to_') &&
+        startsWith(github.event.pull_request.title, 'Bump version') &&
+        contains(github.event.pull_request.title, ' → ')
+    environment: "Create Release"
+    steps:
+      - name: Get new version
+        id: get-new-version
+        env:
+          MERGED_BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          if [[ "${MERGED_BRANCH_NAME}" =~ ^bump_version_to_([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?)$ ]]; then
+            NEW_VERSION=${BASH_REMATCH[1]}
+            echo "::debug::New version=\"${NEW_VERSION}\""
+            echo "version=${NEW_VERSION}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "::error::New version not found in \"${MERGED_BRANCH_NAME}\""
+            exit 1
+          fi
+      - name: Is prerelease?
+        id: is-prerelease
+        run: |
+          IS_PRERELEASE=$([[ "${{ steps.get-new-version.outputs.version }}" == *-[a-z]* ]] && echo true || echo false)
+          echo "result=${IS_PRERELEASE}" >> "${GITHUB_OUTPUT}"
+      - name: Create Release
+        uses: ncipollo/release-action@cdcc88a9acf3ca41c16c37bb7d21b9ad48560d87 # v1.15.0
+        with:
+          token: ${{ secrets.CREATE_RELEASE_TOKEN }}
+          tag: v${{ steps.get-new-version.outputs.version }}
+          name: v${{ steps.get-new-version.outputs.version }} Release
+          commit: main
+          prerelease: ${{ steps.is-prerelease.outputs.result }}
