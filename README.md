@@ -1,5 +1,6 @@
 [![Kotlin](https://img.shields.io/badge/kotlin-2.1.10-blue.svg)](http://kotlinlang.org)
 [![CI](https://github.com/plannigan/hamkrest-moshi/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/plannigan/hamkrest-moshi/actions/workflows/main.yaml)
+[![Maven Central](https://img.shields.io/maven-central/v/com.hypercubetools/hamkrest-moshi)][maven]
 [![codecov](https://codecov.io/gh/plannigan/hamkrest-moshi/branch/main/graph/badge.svg)](https://codecov.io/gh/plannigan/hamkrest-moshi)
 
 # hamkrest-moshi
@@ -49,6 +50,7 @@ val reflectionMoshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 assertThat("""{"id":42,"name":"Fooius"}""", deserializesTo(someFoo), moshi = reflectionMoshi)
 ```
 
+[maven]: https://central.sonatype.com/artifact/com.hypercubetools/ktor-moshi/
 [hamkrest]: https://github.com/npryce/hamkrest
 [moshi]: https://github.com/square/moshi/
 [moshi-codegen]: https://github.com/square/moshi/#codegen
