@@ -4,7 +4,11 @@ ksp = "2.1.10-1.0.30"
 moshi = "1.15.2"
 hamkrest = "1.8.0.1"
 spek = "2.0.19"
+nexus = "2.0.0"
+dokka = "2.0.0"
+sigstore = "1.2.0"
 jacocolog = "3.1.0"
+use-python = "4.1.0"
 
 [libraries]
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
@@ -21,4 +25,9 @@ spek-engine = { group = "org.spekframework.spek2", name = "spek-runner-junit5", 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
+nexus = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus" }
+sigstore = { id = "dev.sigstore.sign", version.ref = "sigstore" }
 jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }
+use-python = { id = "ru.vyarus.use-python", version.ref = "use-python" }
