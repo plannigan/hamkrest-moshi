@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.10"
-ksp = "2.1.10-1.0.29"
+ksp = "2.1.10-1.0.30"
 moshi = "1.15.2"
 hamkrest = "1.8.0.1"
 spek = "2.0.19"
